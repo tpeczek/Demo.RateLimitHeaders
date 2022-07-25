@@ -1,4 +1,5 @@
 using AspNetCoreRateLimit;
+using Demo.RateLimitHeaders.AspNetCore.RateLimitPackage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,11 +20,15 @@ builder.Services.AddInMemoryRateLimiting();
 
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
+builder.Services.AddSingleton<IRateLimitHeadersOnlyProcessingStrategy, RateLimitHeadersOnlyProcessingStrategy>();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 
 app.UseIpRateLimiting();
+
+app.UseMiddleware<IpRateLimitHeadersMiddleware>();
 
 app.MapGet("/", context => context.Response.WriteAsync("-- Demo.RateLimitHeaders.AspNetCore.RateLimitPackage --"));
 
